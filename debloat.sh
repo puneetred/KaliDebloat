@@ -156,24 +156,31 @@ draw_title() {
     local title_color=$RED
     local title_length=${#title}
     local border_color=$NC
-    local border_width=$((title_length + 6))
+    local border_width=80
 
     printf "${border_color}"
     printf "+"
-    printf -- "-%.0s" $(seq 1 "$border_width")
+    printf -- "-%.0s" $(seq 1 "$((border_width - 2))")
     printf "+\n"
     first_word=$(echo "$title" | awk '{print $1}')
     second_word=$(echo "$title" | awk '{print $2}')
-    printf "|   ${NC}${first_word}${border_color} ${title_color}\e[1m${second_word}${border_color}\e[0m   |\n"
+    remaining_space=$((80 - title_length - 2))
+    left_width=$((remaining_space / 2))
+    right_width=$((remaining_space - left_width))
+    left_space=$(printf ' %.0s' $(seq 1 "$left_width"))
+    right_space=$(printf ' %.0s' $(seq 1 "$right_width"))
+    printf "|$left_space${NC}${first_word}${border_color} ${title_color}\e[1m${second_word}${border_color}\e[0m$right_space|\n"
     printf "+"
-    printf -- "-%.0s" $(seq 1 "$border_width")
+    printf -- "-%.0s" $(seq 1 "$((border_width - 2))")
     printf "+${NC}\n\n"
 }
 
 uninstall_tool() {
     package_name="$1"
 
-    if dpkg -l | grep -q "$package_name"; then
+    package_status=$(dpkg-query -W -f='${Status}' $package_name 2>/dev/null)
+
+    if [ "$package_status" == "install ok installed" ]; then
         description=$(get_tool_description "$package_name")
 
         draw_title "Package: $package_name" "$YELLOW"
@@ -212,12 +219,12 @@ animate_logo() {
         tput cup 0 0
 
         echo -ne "\033[37m\r"  # Set text color
-        echo -ne "\033[2K\r╔═════════════════════════════════════════════════════════════════════════════╗\n"
-        echo -ne "\033[2K\r║                                                                             ║\n"
-        echo -ne "\033[2K\r║            \033[${color_code}m█▄▀ ▄▀█ █░░ █   █▀▄ █▀▀ █▄▄ █░░ █▀█ ▄▀█ ▀█▀ █▀▀ █▀█\033[37m              ║\n"
-        echo -ne "\033[2K\r║            \033[${color_code}m█░█ █▀█ █▄▄ █   █▄▀ ██▄ █▄█ █▄▄ █▄█ █▀█ ░█░ ██▄ █▀▄\033[37m              ║\n"
-        echo -ne "\033[2K\r║                                                   by puneetred              ║\n"
-        echo -ne "\033[2K\r╚═════════════════════════════════════════════════════════════════════════════╝\n"
+        echo -ne "\033[2K\r╔══════════════════════════════════════════════════════════════════════════════╗\n"
+        echo -ne "\033[2K\r║                                                                              ║\n"
+        echo -ne "\033[2K\r║             \033[${color_code}m█▄▀ ▄▀█ █░░ █   █▀▄ █▀▀ █▄▄ █░░ █▀█ ▄▀█ ▀█▀ █▀▀ █▀█\033[37m              ║\n"
+        echo -ne "\033[2K\r║             \033[${color_code}m█░█ █▀█ █▄▄ █   █▄▀ ██▄ █▄█ █▄▄ █▄█ █▀█ ░█░ ██▄ █▀▄\033[37m              ║\n"
+        echo -ne "\033[2K\r║                                                    by puneetred              ║\n"
+        echo -ne "\033[2K\r╚══════════════════════════════════════════════════════════════════════════════╝\n"
         echo -ne "\033[2K\r"
         
         # Restore the original cursor position
@@ -233,6 +240,7 @@ animate_logo() {
 execute_uninstall() {
     clear 
     animate_logo &
+    sleep 0.1
 
     # Loop through the packages to uninstall
     for package in "${packages_to_uninstall[@]}"; do
@@ -247,6 +255,8 @@ execute_uninstall() {
             tput ed
         }
         clear_lines
+
+        echo -ne "${YELLOW}Checking $package...${NC}\r"
 
         uninstall_tool "$package"
     done
@@ -266,5 +276,3 @@ execute_uninstall() {
 
 
 execute_uninstall
-
-
