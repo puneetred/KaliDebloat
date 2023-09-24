@@ -1,5 +1,7 @@
 # Kali Linux Debloat Script
 
+![Screenshot of KaliDebloat in action](KaliDebloat/assets/Screenshot.png)
+
 A simple script to help you remove unnecessary tools and applications from your Kali Linux installation, saving storage space. This script provides descriptions of each tool, ensuring you can make informed decisions when uninstalling.
 
 ## Usage
