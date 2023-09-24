@@ -6,12 +6,12 @@ A simple script to help you remove unnecessary tools and applications from your 
 
 1. Clone this repository to your Kali Linux machine.
    ```sh
-   git clone https://github.com/yourusername/kali-linux-debloat.git
+   git clone https://github.com/puneetred/KaliDebloat.git
    ```
 
 2. Navigate to the project directory.
    ```sh
-   cd kali-linux-debloat
+   cd KaliDebloat
    ```
 
 3. Run the script.
